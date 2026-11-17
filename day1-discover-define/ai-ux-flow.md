@@ -39,3 +39,22 @@ Below a confidence threshold, flag the application so that a human customer supp
 ## How we measure trust (Expert)
 
 Accept-as-is rate: the share sample of officers send without additional edits, checked weekly. Target: 8 in 10 by the end of the pilot (made up).
+
+## AI-UX readiness
+
+**Scenario:** B · ICA passport applications
+**Moment:** An applicant is filling in the form and receives guidance
+**Level reached:** below Level 1
+**What we ship:** Fix the trigger first. Only automate when the system is at least 90% certain of intent.
+
+### Levels
+
+- Level 01 · Trigger Accuracy: Not yet. Prompts only show when the user is attempting to fill the specific field
+- Level 02 · System Transparency: Not yet. The field and prompt also shares the expectation in terms of information and format
+- Level 03 · Invisible Integration: Not yet. Proportion of sample applications that need to be further edited, checked weekly
+
+### Trust gaps
+
+- Black box: Users are unclear of the expectation of each field Move: Explicitly share the expectations with examples
+- Hallucination: The AI fills information in the wrong place or guesses some fields Move: Validate recommendations and auto fills precisely against the raw data
+- Control: Irreversible edits or submissions Move: Confirmation message before high criticality items
