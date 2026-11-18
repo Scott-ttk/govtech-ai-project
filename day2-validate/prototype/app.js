@@ -24,6 +24,12 @@ function initProfileSwitcher() {
   select.addEventListener('change', () => {
     if (select.value) {
       resetForm();
+      // Auto-fill NRIC and trigger data pull for demo
+      const profile = loadProfile(select.value);
+      if (profile) {
+        document.getElementById('nric').value = profile.nric;
+        simulateDataPull(profile.nric);
+      }
     }
   });
 }
@@ -373,8 +379,8 @@ function hidePrompt(element) {
 }
 
 function resetForm() {
-  // Clear all fields
-  const inputs = document.querySelectorAll('input:not([type="file"]), select');
+  // Clear all fields except profile selector
+  const inputs = document.querySelectorAll('input:not([type="file"]), select:not(#profile-select)');
   inputs.forEach(input => {
     input.value = '';
     input.disabled = false;
