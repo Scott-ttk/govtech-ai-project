@@ -6,6 +6,19 @@ Use case: [your chosen scenario (A, B, or C), written with synthetic data only]
 ## Opportunity and evidence
 ## Experience and trust
 ## Risks (market, technical, team)
+
+**Market risk:** Users don't trust or understand the prompts. If they don't know what the AI is checking for, they may ignore prompts or lose confidence in the form.
+
+- **How to test:** Watch 5 users complete the form. Ask: "What did you think that message meant?" Count how many correctly explain the prompt's purpose.
+
+**Technical risk:** Prompts fire on false positives. Valid input gets flagged as wrong — edge cases like names with hyphens, transliterations, or unusual address formats.
+
+- **How to test:** Run the prototype against 20 synthetic edge cases (names with hyphens, addresses with unusual formats). Count false flags.
+
+**Team risk:** We can't isolate which feature works. Prompts, Singpass pull, or confirmation step could each be the driver — we won't know what to scale or cut.
+
+- **How to test:** Log which prompts were seen vs. which fields were corrected. Analyse before scaling to know what to keep.
+
 ## Build plan and handoff
 ## Agent role and guardrails
 ## Roles and operating model
