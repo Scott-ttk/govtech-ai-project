@@ -1,6 +1,52 @@
 // Passport Application Prototype - Prompt Logic and Validation
 // All data is synthetic and for prototype testing only
 
+// Behavior prompt: track failed attempts per field
+const fieldAttempts = {};
+const MAX_ATTEMPTS = 2;
+
+function trackAttempt(fieldId, isValid) {
+  if (!fieldAttempts[fieldId]) {
+    fieldAttempts[fieldId] = { attempts: 0, flagged: false };
+  }
+
+  if (!isValid) {
+    fieldAttempts[fieldId].attempts++;
+  } else {
+    // Reset on success
+    fieldAttempts[fieldId].attempts = 0;
+    fieldAttempts[fieldId].flagged = false;
+  }
+
+  return fieldAttempts[fieldId];
+}
+
+function shouldOfferHelp(fieldId) {
+  return fieldAttempts[fieldId] && fieldAttempts[fieldId].attempts >= MAX_ATTEMPTS;
+}
+
+function flagForHelp(fieldId, prompt, input) {
+  fieldAttempts[fieldId].flagged = true;
+  input.classList.add('flagged');
+
+  // Add help link to the prompt
+  const helpMessage = `<br><br><strong>Need help?</strong> <a href="#" class="help-link" data-field="${fieldId}">Speak to an officer</a> or call 6391 6100.`;
+  prompt.innerHTML = prompt.textContent + helpMessage;
+
+  // Add click handler for help link
+  const helpLink = prompt.querySelector('.help-link');
+  if (helpLink) {
+    helpLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      showHelpModal(fieldId);
+    });
+  }
+}
+
+function showHelpModal(fieldId) {
+  alert(`[Prototype] This would open a chat with an ICA officer about the "${fieldId}" field.\n\nThe application has been flagged for follow-up.`);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initProfileSwitcher();
   initNricPull();
@@ -223,28 +269,40 @@ function validatePhone() {
 
   if (!value) return;
 
+  let isValid = false;
+  let errorMessage = '';
+
   // Expand prompt: specific feedback on what's expected and where input falls short
   if (value.startsWith('+65')) {
-    showPrompt(prompt, 'validation-warning', `You entered "${value}". Remove the +65 country code — we only need the 8-digit number (e.g. 91234567).`);
-    input.classList.add('error');
+    errorMessage = `You entered "${value}". Remove the +65 country code — we only need the 8-digit number (e.g. 91234567).`;
   } else if (value.startsWith('65')) {
-    showPrompt(prompt, 'validation-warning', `You entered "${value}". Remove the 65 country code — we only need the 8-digit number (e.g. 91234567).`);
-    input.classList.add('error');
+    errorMessage = `You entered "${value}". Remove the 65 country code — we only need the 8-digit number (e.g. 91234567).`;
   } else if (value.length < 8) {
-    showPrompt(prompt, 'validation-error', `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits starting with 8 or 9.`);
-    input.classList.add('error');
+    errorMessage = `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits starting with 8 or 9.`;
   } else if (value.length > 8) {
-    showPrompt(prompt, 'validation-error', `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits — no spaces or dashes.`);
-    input.classList.add('error');
+    errorMessage = `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits — no spaces or dashes.`;
   } else if (!/^[89]/.test(value)) {
-    showPrompt(prompt, 'validation-error', `Your number starts with ${value[0]}. Singapore mobile numbers start with 8 or 9.`);
-    input.classList.add('error');
+    errorMessage = `Your number starts with ${value[0]}. Singapore mobile numbers start with 8 or 9.`;
   } else if (!/^\d+$/.test(value)) {
-    showPrompt(prompt, 'validation-error', 'Please enter digits only — no spaces, dashes or letters.');
-    input.classList.add('error');
+    errorMessage = 'Please enter digits only — no spaces, dashes or letters.';
   } else {
+    isValid = true;
+  }
+
+  // Behavior prompt: track attempts and offer help after 2 failures
+  const status = trackAttempt('phone', isValid);
+
+  if (isValid) {
     showPrompt(prompt, 'soft-success', 'Looks good');
-    input.classList.remove('error');
+    input.classList.remove('error', 'flagged');
+  } else {
+    const attemptType = errorMessage.includes('country code') ? 'validation-warning' : 'validation-error';
+    showPrompt(prompt, attemptType, errorMessage);
+    input.classList.add('error');
+
+    if (shouldOfferHelp('phone') && !status.flagged) {
+      flagForHelp('phone', prompt, input);
+    }
   }
 }
 

@@ -196,6 +196,24 @@ h1 {
   font-size: 0.75rem;
 }
 
+/* Flagged field - needs help */
+input.flagged,
+select.flagged {
+  border-color: var(--warning);
+  background: var(--warning-light);
+}
+
+.help-link {
+  color: var(--primary);
+  text-decoration: underline;
+  font-weight: 500;
+}
+
+.help-link:hover {
+  color: var(--primary);
+  text-decoration: none;
+}
+
 /* Auto-filled indicator */
 .auto-filled {
   display: inline-block;
