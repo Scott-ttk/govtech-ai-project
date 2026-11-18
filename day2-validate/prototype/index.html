@@ -13,121 +13,166 @@
       <p class="subtitle">Prototype for testing application prompts — all data is synthetic</p>
     </header>
 
-    <!-- Profile switcher for demo -->
-    <div class="profile-switcher">
-      <label for="profile-select">Demo profile:</label>
-      <select id="profile-select">
-        <option value="">Select a profile to test...</option>
-      </select>
+    <!-- Onboarding Section -->
+    <div id="onboarding-section" class="onboarding">
+      <h2 class="section-title">Before you start</h2>
+
+      <div class="field">
+        <label for="applying-for">Who is this application for?</label>
+        <select id="applying-for">
+          <option value="">Select...</option>
+          <option value="self">Myself</option>
+          <option value="others">Someone else (e.g. child, elderly parent)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="application-type">What type of application is this?</label>
+        <select id="application-type">
+          <option value="">Select...</option>
+          <option value="new">New passport (first-time)</option>
+          <option value="renewal">Renewal (passport expiring or expired)</option>
+          <option value="lost">Replacement (lost passport)</option>
+          <option value="damaged">Replacement (damaged passport)</option>
+          <option value="pages">Additional pages (run out of visa pages)</option>
+        </select>
+      </div>
+
+      <div class="prep-box">
+        <h3>What you'll need</h3>
+        <ul id="prep-list" class="prep-list">
+          <li>Passport-sized digital photo (taken within last 3 months)</li>
+        </ul>
+      </div>
+
+      <button type="button" id="start-application" class="btn btn-primary">Continue to Application</button>
     </div>
 
-    <form id="passport-form">
-      <!-- Section: Identity Verification -->
-      <div class="form-section">
-        <h2 class="section-title">Identity Verification</h2>
+    <!-- Form Sections (hidden initially) -->
+    <div id="form-sections" style="display: none;">
+      <form id="passport-form">
+        <!-- Section: Identity Verification -->
+        <div class="form-section">
+          <h2 class="section-title">Identity Verification</h2>
 
-        <div class="field">
-          <label for="nric">NRIC</label>
-          <input type="text" id="nric" placeholder="e.g. S1234567A" maxlength="9" autocomplete="off">
-          <div id="nric-pull-prompt" class="prompt pull">
-            Enter your NRIC to retrieve your registered details from government records
+          <div class="field">
+            <label for="nric">NRIC</label>
+            <div class="nric-input-group">
+              <input type="text" id="nric" placeholder="e.g. S1234567A" maxlength="9" autocomplete="off">
+              <button type="button" id="singpass-btn" class="btn btn-singpass">Retrieve via Singpass</button>
+            </div>
+            <div id="nric-pull-prompt" class="prompt hint">
+              Enter your NRIC and click the button to retrieve your registered details
+            </div>
           </div>
-        </div>
-      </div>
 
-      <!-- Section: Personal Details -->
-      <div class="form-section">
-        <h2 class="section-title">Personal Details</h2>
-
-        <div class="field">
-          <label for="name">Full Name (as in NRIC)</label>
-          <input type="text" id="name" disabled>
-        </div>
-
-        <div class="field">
-          <label for="dob">Date of Birth</label>
-          <input type="date" id="dob" disabled>
-        </div>
-
-        <div class="field">
-          <label for="gender">Gender</label>
-          <select id="gender" disabled>
-            <option value="">-</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label for="race">Race</label>
-          <input type="text" id="race" disabled>
-        </div>
-      </div>
-
-      <!-- Section: Contact Information -->
-      <div class="form-section">
-        <h2 class="section-title">Contact Information</h2>
-
-        <div class="field">
-          <label for="address">Residential Address</label>
-          <input type="text" id="address" placeholder="Your registered address">
-          <div id="address-prompt" class="prompt hint">
-            Format: BLK [number] [street name] #[unit] SINGAPORE [postal]
+          <!-- Demo profile selector -->
+          <div class="demo-profile-box">
+            <div class="demo-label">Demo mode</div>
+            <div class="demo-content">
+              <label for="profile-select">Select a test profile:</label>
+              <select id="profile-select">
+                <option value="">Choose profile...</option>
+              </select>
+              <p class="demo-hint">Selecting a profile will fill the NRIC field. Then click "Retrieve via Singpass" to load the data.</p>
+            </div>
           </div>
         </div>
 
-        <div class="field">
-          <label for="phone">Mobile Number</label>
-          <input type="tel" id="phone" placeholder="e.g. 91234567" maxlength="12">
-          <div id="phone-prompt" class="prompt hint">
-            8-digit number starting with 8 or 9 (e.g. 91234567)
+        <!-- Section: Personal Details -->
+        <div class="form-section">
+          <h2 class="section-title">Personal Details</h2>
+
+          <div class="field">
+            <label for="name">Full Name (as in NRIC)</label>
+            <input type="text" id="name" placeholder="Will be retrieved from Singpass">
+          </div>
+
+          <div class="field">
+            <label for="dob">Date of Birth</label>
+            <input type="date" id="dob">
+          </div>
+
+          <div class="field">
+            <label for="gender">Gender</label>
+            <select id="gender">
+              <option value="">-</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="race">Race</label>
+            <input type="text" id="race" placeholder="Will be retrieved from Singpass">
           </div>
         </div>
 
-        <div class="field">
-          <label for="email">Email Address</label>
-          <input type="email" id="email" placeholder="e.g. yourname@email.com">
-          <div id="email-prompt" class="prompt"></div>
-        </div>
-      </div>
+        <!-- Section: Contact Information -->
+        <div class="form-section">
+          <h2 class="section-title">Contact Information</h2>
 
-      <!-- Section: Application Details -->
-      <div class="form-section">
-        <h2 class="section-title">Application Details</h2>
-
-        <div class="field">
-          <label for="reason">Reason for Application</label>
-          <select id="reason">
-            <option value="">Select a reason...</option>
-            <option value="first">First-time application</option>
-            <option value="renewal">Passport expiring or expired</option>
-            <option value="lost">Lost passport</option>
-            <option value="damaged">Damaged passport</option>
-            <option value="pages">Run out of visa pages</option>
-          </select>
-        </div>
-
-        <div class="field">
-          <label>Passport Photo</label>
-          <div id="photo-upload" class="photo-upload">
-            <input type="file" id="photo-file" accept="image/*">
-            <p class="photo-upload-text">
-              <strong>Click to upload</strong> or drag and drop<br>
-              JPEG or PNG, max 2MB
-            </p>
+          <div class="field">
+            <label for="address">Residential Address</label>
+            <input type="text" id="address" placeholder="Will be retrieved from Singpass">
+            <div id="address-prompt" class="prompt hint">
+              Format: BLK [number] [street name] #[unit] SINGAPORE [postal]
+            </div>
           </div>
-          <div id="photo-prompt" class="prompt hint">
-            Requirements: Recent colour photo, white background, 400x514 pixels minimum, JPEG format
+
+          <div class="field">
+            <label for="phone">Mobile Number</label>
+            <input type="tel" id="phone" placeholder="Will be retrieved from Singpass" maxlength="12">
+            <div id="phone-prompt" class="prompt hint">
+              8-digit number starting with 8 or 9 (e.g. 91234567)
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="e.g. yourname@email.com">
+            <div id="email-prompt" class="prompt"></div>
           </div>
         </div>
-      </div>
 
-      <!-- Buttons -->
-      <div class="button-group">
-        <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-        <button type="submit" id="submit-btn" class="btn btn-primary">Review & Submit</button>
-      </div>
-    </form>
+        <!-- Section: Application Details -->
+        <div class="form-section">
+          <h2 class="section-title">Application Details</h2>
+
+          <div class="field">
+            <label for="reason">Reason for Application</label>
+            <select id="reason">
+              <option value="">Select a reason...</option>
+              <option value="first">First-time application</option>
+              <option value="renewal">Passport expiring or expired</option>
+              <option value="lost">Lost passport</option>
+              <option value="damaged">Damaged passport</option>
+              <option value="pages">Run out of visa pages</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Passport Photo</label>
+            <div id="photo-upload" class="photo-upload">
+              <input type="file" id="photo-file" accept="image/*">
+              <p class="photo-upload-text">
+                <strong>Click to upload</strong> or drag and drop<br>
+                JPEG or PNG, max 2MB
+              </p>
+            </div>
+            <div id="photo-prompt" class="prompt hint">
+              Requirements: Recent colour photo, white background, 400x514 pixels minimum, JPEG format
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+          <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+          <button type="submit" id="submit-btn" class="btn btn-primary">Review & Submit</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- Confirmation Modal -->

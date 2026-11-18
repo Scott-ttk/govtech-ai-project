@@ -334,6 +334,118 @@ h1 {
   font-weight: 500;
 }
 
+/* Onboarding section */
+.onboarding {
+  margin-bottom: 32px;
+}
+
+.prep-box {
+  background: var(--primary-light);
+  border-radius: 6px;
+  padding: 16px 20px;
+  margin: 20px 0;
+}
+
+.prep-box h3 {
+  margin: 0 0 12px 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.prep-list {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--gray-700);
+  font-size: 0.875rem;
+}
+
+.prep-list li {
+  margin-bottom: 6px;
+}
+
+.prep-list li:last-child {
+  margin-bottom: 0;
+}
+
+/* NRIC input with Singpass button */
+.nric-input-group {
+  display: flex;
+  gap: 12px;
+}
+
+.nric-input-group input {
+  flex: 1;
+}
+
+.btn-singpass {
+  background: #f4333d;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.btn-singpass:hover {
+  background: #d92d36;
+}
+
+.btn-singpass:disabled {
+  background: var(--gray-300);
+  cursor: not-allowed;
+}
+
+/* Demo profile box */
+.demo-profile-box {
+  background: #fffbeb;
+  border: 2px dashed #f59e0b;
+  border-radius: 6px;
+  padding: 16px;
+  margin-top: 20px;
+}
+
+.demo-label {
+  display: inline-block;
+  background: #f59e0b;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 3px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.demo-content label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-700);
+  margin-bottom: 6px;
+}
+
+.demo-content select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #f59e0b;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.demo-hint {
+  font-size: 0.8125rem;
+  color: var(--gray-500);
+  margin: 8px 0 0 0;
+  font-style: italic;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   body {
@@ -349,6 +461,14 @@ h1 {
   }
 
   .btn {
+    width: 100%;
+  }
+
+  .nric-input-group {
+    flex-direction: column;
+  }
+
+  .btn-singpass {
     width: 100%;
   }
 }

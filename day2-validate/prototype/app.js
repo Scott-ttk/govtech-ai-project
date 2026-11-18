@@ -3,6 +3,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initProfileSwitcher();
+  initOnboarding();
   initNricPull();
   initFieldValidations();
   initPhotoUpload();
@@ -24,44 +25,122 @@ function initProfileSwitcher() {
   select.addEventListener('change', () => {
     if (select.value) {
       resetForm();
-      // Auto-fill NRIC and trigger data pull for demo
+      // Auto-fill NRIC for demo (user still needs to click Retrieve)
       const profile = loadProfile(select.value);
       if (profile) {
         document.getElementById('nric').value = profile.nric;
-        simulateDataPull(profile.nric);
       }
     }
   });
 }
 
-// NRIC entry triggers data pull
+// Onboarding step
+function initOnboarding() {
+  const startBtn = document.getElementById('start-application');
+  const onboardingSection = document.getElementById('onboarding-section');
+  const formSections = document.getElementById('form-sections');
+  const prepList = document.getElementById('prep-list');
+  const applyingFor = document.getElementById('applying-for');
+  const applicationType = document.getElementById('application-type');
+
+  // Update prep list based on selections
+  function updatePrepList() {
+    const forWhom = applyingFor.value;
+    const type = applicationType.value;
+
+    let items = [];
+
+    // Base items
+    items.push('Passport-sized digital photo (taken within last 3 months)');
+
+    if (forWhom === 'others') {
+      items.push('Applicant\'s NRIC or Birth Certificate');
+      items.push('Your NRIC (as the person submitting)');
+    }
+
+    if (type === 'lost') {
+      items.push('Police report (if lost overseas)');
+    } else if (type === 'damaged') {
+      items.push('Damaged passport for verification');
+    }
+
+    if (type === 'renewal' || type === 'pages') {
+      items.push('Current passport details');
+    }
+
+    // Update the list
+    prepList.innerHTML = items.map(item => `<li>${item}</li>`).join('');
+  }
+
+  applyingFor.addEventListener('change', updatePrepList);
+  applicationType.addEventListener('change', updatePrepList);
+
+  // Initialize
+  updatePrepList();
+
+  // Start button
+  startBtn.addEventListener('click', () => {
+    if (!applyingFor.value || !applicationType.value) {
+      alert('Please select who you are applying for and the application type.');
+      return;
+    }
+
+    // Pre-fill reason dropdown based on selection
+    const reasonSelect = document.getElementById('reason');
+    const typeMap = {
+      'new': 'first',
+      'renewal': 'renewal',
+      'lost': 'lost',
+      'damaged': 'damaged',
+      'pages': 'pages'
+    };
+    reasonSelect.value = typeMap[applicationType.value] || '';
+
+    // Show form, hide onboarding
+    onboardingSection.style.display = 'none';
+    formSections.style.display = 'block';
+  });
+}
+
+// NRIC entry with explicit Singpass button
 function initNricPull() {
   const nricInput = document.getElementById('nric');
+  const pullBtn = document.getElementById('singpass-btn');
   const pullPrompt = document.getElementById('nric-pull-prompt');
 
-  // Show pull prompt when user focuses on NRIC
-  nricInput.addEventListener('focus', () => {
-    showPrompt(pullPrompt, 'pull');
-  });
-
-  // Validate and pull data on blur
+  // Validate NRIC format on blur
   nricInput.addEventListener('blur', () => {
     const value = nricInput.value.toUpperCase().trim();
     nricInput.value = value;
 
-    if (value && isValidNricFormat(value)) {
-      simulateDataPull(value);
-    } else if (value) {
+    if (value && !isValidNricFormat(value)) {
       showPrompt(pullPrompt, 'validation-error', 'Please enter a valid NRIC (e.g. S1234567A)');
+      pullBtn.disabled = true;
+    } else if (value) {
+      hidePrompt(pullPrompt);
+      pullBtn.disabled = false;
     }
   });
 
-  // Also trigger on Enter key
-  nricInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      nricInput.blur();
+  // Singpass button triggers data pull
+  pullBtn.addEventListener('click', () => {
+    const value = nricInput.value.toUpperCase().trim();
+
+    if (!value || !isValidNricFormat(value)) {
+      showPrompt(pullPrompt, 'validation-error', 'Please enter a valid NRIC first');
+      return;
     }
+
+    // Show loading state
+    pullBtn.textContent = 'Retrieving...';
+    pullBtn.disabled = true;
+
+    // Simulate API delay
+    setTimeout(() => {
+      simulateDataPull(value);
+      pullBtn.textContent = 'Retrieve via Singpass';
+      pullBtn.disabled = false;
+    }, 800);
   });
 }
 
@@ -73,11 +152,10 @@ function simulateDataPull(nric) {
   const profileSelect = document.getElementById('profile-select');
   const pullPrompt = document.getElementById('nric-pull-prompt');
 
-  // Find matching profile or use first one
+  // Find matching profile or use selected one
   let profile = Object.values(PROFILES).find(p => p.nric.toUpperCase() === nric.toUpperCase());
 
   if (!profile) {
-    // For demo, load selected profile or default
     profile = loadProfile(profileSelect.value || 'complete');
   } else {
     profileSelect.value = profile.id;
@@ -85,18 +163,18 @@ function simulateDataPull(nric) {
   }
 
   if (profile) {
-    // Populate auto-filled fields
+    // All fields are auto-filled but editable
     populateField('name', profile.name, true);
     populateField('dob', profile.dob, true);
     populateField('gender', profile.gender, true);
     populateField('race', profile.race, true);
-    populateField('address', profile.address, false); // Editable
-    populateField('phone', profile.phone, false);
-    populateField('email', profile.email, false);
+    populateField('address', profile.address, true);
+    populateField('phone', profile.phone, true);
+    populateField('email', profile.email, false); // Email not from gov records
 
-    showPrompt(pullPrompt, 'validation-success', 'Details retrieved from government records. Please verify and complete the remaining fields.');
+    showPrompt(pullPrompt, 'validation-success', 'Details retrieved from government records. Please verify and update if needed.');
 
-    // If address has a note, show it
+    // Show address note if applicable
     if (profile.addressNote) {
       const addressPrompt = document.getElementById('address-prompt');
       showPrompt(addressPrompt, 'validation-warning', profile.addressNote);
@@ -107,15 +185,15 @@ function simulateDataPull(nric) {
   }
 }
 
-function populateField(fieldId, value, readonly) {
+function populateField(fieldId, value, showAutoFilled) {
   const input = document.getElementById(fieldId);
   if (input) {
     input.value = value || '';
-    input.disabled = readonly;
+    input.disabled = false; // All fields are editable
 
-    // Add auto-filled indicator for readonly fields
+    // Add auto-filled indicator
     const label = input.closest('.field').querySelector('label');
-    if (readonly && value) {
+    if (showAutoFilled && value) {
       if (!label.querySelector('.auto-filled')) {
         const badge = document.createElement('span');
         badge.className = 'auto-filled';
@@ -133,7 +211,9 @@ function initFieldValidations() {
   phoneInput.addEventListener('blur', validatePhone);
   phoneInput.addEventListener('focus', () => {
     const prompt = document.getElementById('phone-prompt');
-    showPrompt(prompt, 'hint', '8-digit number starting with 8 or 9 (e.g. 91234567)');
+    if (!prompt.classList.contains('validation-warning') && !prompt.classList.contains('validation-error')) {
+      showPrompt(prompt, 'hint', '8-digit number starting with 8 or 9 (e.g. 91234567)');
+    }
   });
 
   // Email validation
@@ -260,7 +340,6 @@ function handlePhotoUpload(file) {
 
 // Form submission
 function initFormSubmit() {
-  const form = document.getElementById('passport-form');
   const submitBtn = document.getElementById('submit-btn');
   const modal = document.getElementById('confirm-modal');
   const confirmBtn = document.getElementById('confirm-submit');
@@ -379,8 +458,8 @@ function hidePrompt(element) {
 }
 
 function resetForm() {
-  // Clear all fields except profile selector
-  const inputs = document.querySelectorAll('input:not([type="file"]), select:not(#profile-select)');
+  // Clear all fields except profile selector, onboarding selects
+  const inputs = document.querySelectorAll('#form-sections input:not([type="file"]), #form-sections select:not(#profile-select)');
   inputs.forEach(input => {
     input.value = '';
     input.disabled = false;
