@@ -111,8 +111,14 @@ function simulateDataPull(nric) {
       showPrompt(addressPrompt, 'validation-warning', profile.addressNote);
     }
 
-    // Check phone format
-    validatePhone();
+    // Show phone note if applicable (e.g. missing info scenario)
+    if (profile.phoneNote) {
+      const phonePrompt = document.getElementById('phone-prompt');
+      showPrompt(phonePrompt, 'validation-warning', profile.phoneNote);
+    } else {
+      // Check phone format
+      validatePhone();
+    }
   }
 }
 

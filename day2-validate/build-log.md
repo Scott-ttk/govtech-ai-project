@@ -40,3 +40,24 @@ We have guardrails — the system will never guess or auto-correct, only flaggin
 
 **Requirement to prove:**
 Guardrails hold: no guessed or auto-corrected data reaches submission without explicit user confirmation.
+
+---
+
+## Riskiest assumption
+
+**Assumption:** Prompts can help people fill in better information.
+
+**Why it might be wrong:** People might already understand the fields but simply don't have the information required. That's a different problem — prompts won't help someone who needs to go find their previous passport number.
+
+**Risk type:** Value — are we solving the right problem?
+
+**Kill switch:** Most users who see a prompt still can't complete the field (they understood it, they just don't have the info).
+
+**Success signal:** Users who see a prompt successfully correct or complete the field.
+
+**How the prototype tests this:**
+Two synthetic profiles represent each case:
+1. **Profile D: Confused format** — user has the info but entered it wrong (date as DDMMYYYY instead of YYYYMMDD). Prompt should help.
+2. **Profile E: Missing info** — user doesn't have the info (previous passport number blank for renewal). Prompt won't help — they need to go find it.
+
+All test data is made up.
