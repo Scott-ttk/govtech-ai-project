@@ -157,7 +157,7 @@ function initFieldValidations() {
   const emailInput = document.getElementById('email');
   emailInput.addEventListener('blur', validateEmail);
 
-  // Address hint
+  // Address validation
   const addressInput = document.getElementById('address');
   addressInput.addEventListener('focus', () => {
     const prompt = document.getElementById('address-prompt');
@@ -165,6 +165,43 @@ function initFieldValidations() {
       showPrompt(prompt, 'hint', 'Format: BLK [number] [street name] #[unit] SINGAPORE [postal]');
     }
   });
+  addressInput.addEventListener('blur', validateAddress);
+}
+
+function validateAddress() {
+  const input = document.getElementById('address');
+  const prompt = document.getElementById('address-prompt');
+  const value = input.value.trim().toUpperCase();
+
+  if (!value) return;
+
+  // Check for common abbreviations that should be expanded
+  const abbreviations = [
+    { abbr: /\bST\b/, full: 'STREET' },
+    { abbr: /\bAVE\b/, full: 'AVENUE' },
+    { abbr: /\bRD\b/, full: 'ROAD' },
+    { abbr: /\bDR\b/, full: 'DRIVE' },
+    { abbr: /\bS(\d{6})/, full: 'SINGAPORE $1' }, // S570123 -> SINGAPORE 570123
+  ];
+
+  let hasAbbreviation = false;
+  for (const { abbr } of abbreviations) {
+    if (abbr.test(value)) {
+      hasAbbreviation = true;
+      break;
+    }
+  }
+
+  // Check if SINGAPORE is spelled out
+  const hasSingapore = /SINGAPORE\s*\d{6}/.test(value);
+
+  if (hasAbbreviation || (!hasSingapore && /\d{6}/.test(value))) {
+    showPrompt(prompt, 'validation-warning', 'Please use full format: STREET (not ST), SINGAPORE (not S) before postal code.');
+    input.classList.add('error');
+  } else {
+    hidePrompt(prompt);
+    input.classList.remove('error');
+  }
 }
 
 function validatePhone() {
@@ -182,7 +219,8 @@ function validatePhone() {
     showPrompt(prompt, 'validation-error', 'Please enter a valid 8-digit mobile number starting with 8 or 9');
     input.classList.add('error');
   } else {
-    showPrompt(prompt, 'validation-success', 'Format looks correct');
+    // Q5: Stay silent when format is correct
+    hidePrompt(prompt);
     input.classList.remove('error');
   }
 }
