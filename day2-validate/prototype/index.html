@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Passport Application - Prototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Singapore Passport Application</h1>
+      <p class="subtitle">Prototype for testing application prompts — all data is synthetic</p>
+    </header>
+
+    <!-- Profile switcher for demo -->
+    <div class="profile-switcher">
+      <label for="profile-select">Demo profile:</label>
+      <select id="profile-select">
+        <option value="">Select a profile to test...</option>
+      </select>
+    </div>
+
+    <form id="passport-form">
+      <!-- Section: Identity Verification -->
+      <div class="form-section">
+        <h2 class="section-title">Identity Verification</h2>
+
+        <div class="field">
+          <label for="nric">NRIC</label>
+          <input type="text" id="nric" placeholder="e.g. S1234567A" maxlength="9" autocomplete="off">
+          <div id="nric-pull-prompt" class="prompt pull">
+            Enter your NRIC to retrieve your registered details from government records
+          </div>
+        </div>
+      </div>
+
+      <!-- Section: Personal Details -->
+      <div class="form-section">
+        <h2 class="section-title">Personal Details</h2>
+
+        <div class="field">
+          <label for="name">Full Name (as in NRIC)</label>
+          <input type="text" id="name" disabled>
+        </div>
+
+        <div class="field">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" disabled>
+        </div>
+
+        <div class="field">
+          <label for="gender">Gender</label>
+          <select id="gender" disabled>
+            <option value="">-</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="race">Race</label>
+          <input type="text" id="race" disabled>
+        </div>
+      </div>
+
+      <!-- Section: Contact Information -->
+      <div class="form-section">
+        <h2 class="section-title">Contact Information</h2>
+
+        <div class="field">
+          <label for="address">Residential Address</label>
+          <input type="text" id="address" placeholder="Your registered address">
+          <div id="address-prompt" class="prompt hint">
+            Format: BLK [number] [street name] #[unit] SINGAPORE [postal]
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="phone">Mobile Number</label>
+          <input type="tel" id="phone" placeholder="e.g. 91234567" maxlength="12">
+          <div id="phone-prompt" class="prompt hint">
+            8-digit number starting with 8 or 9 (e.g. 91234567)
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="e.g. yourname@email.com">
+          <div id="email-prompt" class="prompt"></div>
+        </div>
+      </div>
+
+      <!-- Section: Application Details -->
+      <div class="form-section">
+        <h2 class="section-title">Application Details</h2>
+
+        <div class="field">
+          <label for="reason">Reason for Application</label>
+          <select id="reason">
+            <option value="">Select a reason...</option>
+            <option value="first">First-time application</option>
+            <option value="renewal">Passport expiring or expired</option>
+            <option value="lost">Lost passport</option>
+            <option value="damaged">Damaged passport</option>
+            <option value="pages">Run out of visa pages</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Passport Photo</label>
+          <div id="photo-upload" class="photo-upload">
+            <input type="file" id="photo-file" accept="image/*">
+            <p class="photo-upload-text">
+              <strong>Click to upload</strong> or drag and drop<br>
+              JPEG or PNG, max 2MB
+            </p>
+          </div>
+          <div id="photo-prompt" class="prompt hint">
+            Requirements: Recent colour photo, white background, 400x514 pixels minimum, JPEG format
+          </div>
+        </div>
+      </div>
+
+      <!-- Buttons -->
+      <div class="button-group">
+        <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+        <button type="submit" id="submit-btn" class="btn btn-primary">Review & Submit</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Confirmation Modal -->
+  <div id="confirm-modal" class="modal-overlay">
+    <div class="modal">
+      <h2>Confirm Your Application</h2>
+      <div class="modal-content">
+        <p>Please verify the following details before submitting:</p>
+        <ul id="summary-list" class="summary-list"></ul>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" id="cancel-submit" class="btn btn-secondary">Go Back</button>
+        <button type="button" id="confirm-submit" class="btn btn-primary">Confirm & Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="profiles.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
