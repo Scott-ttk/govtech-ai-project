@@ -5,20 +5,31 @@
 const fieldAttempts = {};
 const MAX_ATTEMPTS = 2;
 
-function trackAttempt(fieldId, isValid) {
+function trackAttempt(fieldId, isValid, currentValue) {
   if (!fieldAttempts[fieldId]) {
-    fieldAttempts[fieldId] = { attempts: 0, flagged: false };
+    fieldAttempts[fieldId] = { attempts: 0, flagged: false, lastValue: null };
   }
 
-  if (!isValid) {
-    fieldAttempts[fieldId].attempts++;
-  } else {
+  const state = fieldAttempts[fieldId];
+
+  if (isValid) {
     // Reset on success
-    fieldAttempts[fieldId].attempts = 0;
-    fieldAttempts[fieldId].flagged = false;
+    state.attempts = 0;
+    state.flagged = false;
+    state.lastValue = null;
+  } else {
+    // Only count as new attempt if value is the same as last failed value
+    // If they changed it, they're trying to fix it — don't count
+    if (state.lastValue === currentValue) {
+      state.attempts++;
+    } else {
+      // New value, but still wrong — this is attempt 1, not 2
+      state.attempts = 1;
+    }
+    state.lastValue = currentValue;
   }
 
-  return fieldAttempts[fieldId];
+  return state;
 }
 
 function shouldOfferHelp(fieldId) {
@@ -290,7 +301,8 @@ function validatePhone() {
   }
 
   // Behavior prompt: track attempts and offer help after 2 failures
-  const status = trackAttempt('phone', isValid);
+  // Only counts if same wrong value is submitted twice (user isn't making progress)
+  const status = trackAttempt('phone', isValid, value);
 
   if (isValid) {
     showPrompt(prompt, 'soft-success', 'Looks good');
