@@ -15,7 +15,9 @@ All data is synthetic and labelled as made up.
 **Edge cases:**
 - Application has legitimately different data types or unique situations
 
-**Result:** _fill in after you run it: what worked, what broke._
+**Result:**
+- **What worked:** Prompts now echo the user's exact input and pinpoint the specific issue — digit count, starting digit, missing symbol, exact abbreviation to expand (e.g. "ST → STREET").
+- **What broke:** Nothing yet. Edge case to watch: very long inputs could make the prompt verbose.
 
 ## 2. Behavior
 
@@ -29,7 +31,9 @@ All data is synthetic and labelled as made up.
 **Edge cases:**
 - Applicant is submitting on behalf of somebody else and doesn't have the necessary information
 
-**Result:** _fill in after you run it: what worked, what broke._
+**Result:**
+- **What worked:** After 2 failed attempts (changes to new wrong values), field is flagged yellow and shows "Need help? Speak to an officer or call 6391 6100." Clicking help link triggers follow-up request. Counting logic correct: first entry = 0, each change to new wrong value increments, same value doesn't count.
+- **What broke:** Initial logic counted every blur as an attempt — fixed to only count when user changes to a different wrong value. Only phone field has this behavior so far.
 
 ## 3. Refine
 
