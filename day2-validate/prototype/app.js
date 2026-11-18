@@ -219,8 +219,8 @@ function validatePhone() {
     showPrompt(prompt, 'validation-error', 'Please enter a valid 8-digit mobile number starting with 8 or 9');
     input.classList.add('error');
   } else {
-    // Q5: Stay silent when format is correct
-    hidePrompt(prompt);
+    // Q5: Soft confirmation when format is correct — reassures without competing for attention
+    showPrompt(prompt, 'soft-success', 'Looks good');
     input.classList.remove('error');
   }
 }
@@ -413,7 +413,7 @@ function showPrompt(element, type, message) {
   if (!element) return;
 
   // Remove all type classes
-  element.classList.remove('pull', 'hint', 'validation-warning', 'validation-error', 'validation-success');
+  element.classList.remove('pull', 'hint', 'validation-warning', 'validation-error', 'validation-success', 'soft-success');
 
   // Add new type class
   element.classList.add(type);

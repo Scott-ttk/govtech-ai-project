@@ -83,6 +83,6 @@ All questions and answers are made up for prototype testing.
 
 **Expected answer:** "Please enter your mobile number. We'll use this to contact you about your application." This explains why it's needed but cannot help if user doesn't have a local number.
 
-### Q5: When should the system stay silent (no prompt)?
+### Q5: How should the system confirm correct input?
 
-**Expected answer:** When the input matches expected format and validation passes. For example, phone number "82345678" is 8 digits starting with 8 — no prompt needed.
+**Expected answer:** Show a soft, low-emphasis confirmation (e.g. "Looks good") that reassures the user without competing for attention with warnings or errors. The user's focus should stay on actionable items. For example, phone number "82345678" gets a subtle "Looks good" — not silent, but not as prominent as a warning.
