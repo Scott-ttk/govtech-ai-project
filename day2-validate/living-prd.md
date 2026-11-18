@@ -91,20 +91,25 @@ The form covers: reason for application, identity verification (NRIC + Singpass)
 | Component | Status | Location |
 |-----------|--------|----------|
 | Form HTML structure | ✓ Complete | `index.html` |
+| Validation config | ✓ Complete | `config.js` — all rules and messages centralised |
 | Singpass simulation | ✓ Complete | `app.js:simulateDataPull()` |
 | Phone validation + attempt tracking | ✓ Complete | `app.js:validatePhone()` |
 | Address validation (abbreviations) | ✓ Complete | `app.js:validateAddress()` |
-| Email validation | ✓ Partial | `app.js:validateEmail()` — no attempt tracking |
+| Email validation | ✓ Complete | `app.js:validateEmail()` |
 | Help escalation | ✓ Phone only | `app.js:flagForHelp()` |
 | Test profiles | ✓ 5 profiles | `profiles.js` |
 | Prompt styles | ✓ Complete | `style.css` |
 
-**What's hard-coded:**
+**Configuration (in `config.js`):**
 
-- All validation rules (regex patterns, digit counts)
-- All prompt messages (inline strings in JS)
-- Phone number rules (Singapore-specific: 8 digits, starts with 8/9)
-- Address abbreviations (ST, AVE, RD, DR, S+postal)
+- `maxAttempts` — threshold before offering help (currently 2)
+- `phone` — pattern, length, valid start digits, country code, all messages
+- `email` — pattern, all messages
+- `address` — abbreviations array, postal/singapore patterns, all messages
+- `nric` — pattern, messages
+- `help` — escalation message template
+- `singpass` — loading/success messages
+- `submission` — error messages
 
 ---
 
@@ -152,16 +157,16 @@ The form covers: reason for application, identity verification (NRIC + Singpass)
 
 **To move from prototype to production:**
 
-1. **Extend attempt tracking** — currently only phone has it; add to address and email
-2. **Centralise validation rules** — move from inline regex to config file
-3. **Centralise prompt messages** — extract to JSON for i18n and A/B testing
+1. ~~**Centralise validation rules** — move from inline regex to config file~~ ✓ Done
+2. ~~**Centralise prompt messages** — extract to JSON for i18n and A/B testing~~ ✓ Done
+3. **Extend attempt tracking** — currently only phone has it; add to address and email
 4. **Add logging** — track which prompts shown, which fields corrected
 5. **Add tests** — unit tests for validation functions, integration tests for flows
 6. **Accessibility audit** — ARIA labels, focus management, screen reader announcements
 7. **Replace global state** — `fieldAttempts` object → proper state management
 8. **Security review** — `innerHTML` in `flagForHelp()` is XSS risk if user input ever reaches it
 
-**Estimated effort:** 2-3 sprints to production-ready with logging and tests.
+**Estimated effort:** 1-2 sprints to production-ready with logging and tests (reduced after config refactor).
 
 ---
 
@@ -169,9 +174,11 @@ The form covers: reason for application, identity verification (NRIC + Singpass)
 
 **[solid]**
 - Simple UI and logic
+- Validation rules and messages now centralised in `config.js`
 
 **[fragile]**
-- A significant proportion of hard-coded logic
+- ~~A significant proportion of hard-coded logic~~ → Refactored to config
+- Attempt tracking only on phone field
 
 **[surprise]**
 - Some kind of validation logic already exists, albeit being hard coded
