@@ -3,7 +3,6 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   initProfileSwitcher();
-  initOnboarding();
   initNricPull();
   initFieldValidations();
   initPhotoUpload();
@@ -31,74 +30,6 @@ function initProfileSwitcher() {
         document.getElementById('nric').value = profile.nric;
       }
     }
-  });
-}
-
-// Onboarding step
-function initOnboarding() {
-  const startBtn = document.getElementById('start-application');
-  const onboardingSection = document.getElementById('onboarding-section');
-  const formSections = document.getElementById('form-sections');
-  const prepList = document.getElementById('prep-list');
-  const applyingFor = document.getElementById('applying-for');
-  const applicationType = document.getElementById('application-type');
-
-  // Update prep list based on selections
-  function updatePrepList() {
-    const forWhom = applyingFor.value;
-    const type = applicationType.value;
-
-    let items = [];
-
-    // Base items
-    items.push('Passport-sized digital photo (taken within last 3 months)');
-
-    if (forWhom === 'others') {
-      items.push('Applicant\'s NRIC or Birth Certificate');
-      items.push('Your NRIC (as the person submitting)');
-    }
-
-    if (type === 'lost') {
-      items.push('Police report (if lost overseas)');
-    } else if (type === 'damaged') {
-      items.push('Damaged passport for verification');
-    }
-
-    if (type === 'renewal' || type === 'pages') {
-      items.push('Current passport details');
-    }
-
-    // Update the list
-    prepList.innerHTML = items.map(item => `<li>${item}</li>`).join('');
-  }
-
-  applyingFor.addEventListener('change', updatePrepList);
-  applicationType.addEventListener('change', updatePrepList);
-
-  // Initialize
-  updatePrepList();
-
-  // Start button
-  startBtn.addEventListener('click', () => {
-    if (!applyingFor.value || !applicationType.value) {
-      alert('Please select who you are applying for and the application type.');
-      return;
-    }
-
-    // Pre-fill reason dropdown based on selection
-    const reasonSelect = document.getElementById('reason');
-    const typeMap = {
-      'new': 'first',
-      'renewal': 'renewal',
-      'lost': 'lost',
-      'damaged': 'damaged',
-      'pages': 'pages'
-    };
-    reasonSelect.value = typeMap[applicationType.value] || '';
-
-    // Show form, hide onboarding
-    onboardingSection.style.display = 'none';
-    formSections.style.display = 'block';
   });
 }
 

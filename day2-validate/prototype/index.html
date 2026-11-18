@@ -13,44 +13,24 @@
       <p class="subtitle">Prototype for testing application prompts — all data is synthetic</p>
     </header>
 
-    <!-- Onboarding Section -->
-    <div id="onboarding-section" class="onboarding">
-      <h2 class="section-title">Before you start</h2>
-
-      <div class="field">
-        <label for="applying-for">Who is this application for?</label>
-        <select id="applying-for">
-          <option value="">Select...</option>
-          <option value="self">Myself</option>
-          <option value="others">Someone else (e.g. child, elderly parent)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label for="application-type">What type of application is this?</label>
-        <select id="application-type">
-          <option value="">Select...</option>
-          <option value="new">New passport (first-time)</option>
-          <option value="renewal">Renewal (passport expiring or expired)</option>
-          <option value="lost">Replacement (lost passport)</option>
-          <option value="damaged">Replacement (damaged passport)</option>
-          <option value="pages">Additional pages (run out of visa pages)</option>
-        </select>
-      </div>
-
-      <div class="prep-box">
-        <h3>What you'll need</h3>
-        <ul id="prep-list" class="prep-list">
-          <li>Passport-sized digital photo (taken within last 3 months)</li>
-        </ul>
-      </div>
-
-      <button type="button" id="start-application" class="btn btn-primary">Continue to Application</button>
-    </div>
-
-    <!-- Form Sections (hidden initially) -->
-    <div id="form-sections" style="display: none;">
+    <!-- Form Sections -->
+    <div id="form-sections">
       <form id="passport-form">
+        <!-- Section: Reason for Application -->
+        <div class="form-section">
+          <h2 class="section-title">Reason for Application</h2>
+
+          <div class="field">
+            <label for="reason">I am applying for a...</label>
+            <select id="reason">
+              <option value="">Select...</option>
+              <option value="new">New passport</option>
+              <option value="renew">Passport renewal</option>
+              <option value="replace">Replacement passport</option>
+            </select>
+          </div>
+        </div>
+
         <!-- Section: Identity Verification -->
         <div class="form-section">
           <h2 class="section-title">Identity Verification</h2>
@@ -135,21 +115,9 @@
           </div>
         </div>
 
-        <!-- Section: Application Details -->
+        <!-- Section: Photo Upload -->
         <div class="form-section">
-          <h2 class="section-title">Application Details</h2>
-
-          <div class="field">
-            <label for="reason">Reason for Application</label>
-            <select id="reason">
-              <option value="">Select a reason...</option>
-              <option value="first">First-time application</option>
-              <option value="renewal">Passport expiring or expired</option>
-              <option value="lost">Lost passport</option>
-              <option value="damaged">Damaged passport</option>
-              <option value="pages">Run out of visa pages</option>
-            </select>
-          </div>
+          <h2 class="section-title">Passport Photo</h2>
 
           <div class="field">
             <label>Passport Photo</label>
