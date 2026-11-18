@@ -195,11 +195,23 @@ function validateAddress() {
   // Check if SINGAPORE is spelled out
   const hasSingapore = /SINGAPORE\s*\d{6}/.test(value);
 
-  if (hasAbbreviation || (!hasSingapore && /\d{6}/.test(value))) {
-    showPrompt(prompt, 'validation-warning', 'Please use full format: STREET (not ST), SINGAPORE (not S) before postal code.');
+  // Expand prompt: specific feedback on what needs to change
+  if (hasAbbreviation) {
+    // Find which abbreviation was used
+    let found = '';
+    if (/\bST\b/.test(value)) found = 'ST → STREET';
+    else if (/\bAVE\b/.test(value)) found = 'AVE → AVENUE';
+    else if (/\bRD\b/.test(value)) found = 'RD → ROAD';
+    else if (/\bDR\b/.test(value)) found = 'DR → DRIVE';
+    else if (/\bS\d{6}/.test(value)) found = 'S → SINGAPORE before postal code';
+
+    showPrompt(prompt, 'validation-warning', `Please spell out "${found}". ICA requires full words, not abbreviations.`);
+    input.classList.add('error');
+  } else if (!hasSingapore && /\d{6}/.test(value)) {
+    showPrompt(prompt, 'validation-warning', 'Add "SINGAPORE" before the postal code (e.g. SINGAPORE 570123, not just 570123).');
     input.classList.add('error');
   } else {
-    hidePrompt(prompt);
+    showPrompt(prompt, 'soft-success', 'Looks good');
     input.classList.remove('error');
   }
 }
@@ -211,15 +223,26 @@ function validatePhone() {
 
   if (!value) return;
 
-  // Check for common format errors
-  if (value.startsWith('65') || value.startsWith('+65')) {
-    showPrompt(prompt, 'validation-warning', 'Please enter without country code. Just the 8-digit number.');
+  // Expand prompt: specific feedback on what's expected and where input falls short
+  if (value.startsWith('+65')) {
+    showPrompt(prompt, 'validation-warning', `You entered "${value}". Remove the +65 country code — we only need the 8-digit number (e.g. 91234567).`);
     input.classList.add('error');
-  } else if (!/^[89]\d{7}$/.test(value)) {
-    showPrompt(prompt, 'validation-error', 'Please enter a valid 8-digit mobile number starting with 8 or 9');
+  } else if (value.startsWith('65')) {
+    showPrompt(prompt, 'validation-warning', `You entered "${value}". Remove the 65 country code — we only need the 8-digit number (e.g. 91234567).`);
+    input.classList.add('error');
+  } else if (value.length < 8) {
+    showPrompt(prompt, 'validation-error', `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits starting with 8 or 9.`);
+    input.classList.add('error');
+  } else if (value.length > 8) {
+    showPrompt(prompt, 'validation-error', `You entered ${value.length} digits. Singapore mobile numbers have exactly 8 digits — no spaces or dashes.`);
+    input.classList.add('error');
+  } else if (!/^[89]/.test(value)) {
+    showPrompt(prompt, 'validation-error', `Your number starts with ${value[0]}. Singapore mobile numbers start with 8 or 9.`);
+    input.classList.add('error');
+  } else if (!/^\d+$/.test(value)) {
+    showPrompt(prompt, 'validation-error', 'Please enter digits only — no spaces, dashes or letters.');
     input.classList.add('error');
   } else {
-    // Q5: Soft confirmation when format is correct — reassures without competing for attention
     showPrompt(prompt, 'soft-success', 'Looks good');
     input.classList.remove('error');
   }
@@ -232,9 +255,18 @@ function validateEmail() {
 
   if (!value) return;
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(value)) {
-    showPrompt(prompt, 'validation-error', 'Please enter a valid email address');
+  // Expand prompt: specific feedback on what's missing
+  if (!value.includes('@')) {
+    showPrompt(prompt, 'validation-error', `You entered "${value}". Email addresses need an @ symbol (e.g. name@email.com).`);
+    input.classList.add('error');
+  } else if (!value.includes('.')) {
+    showPrompt(prompt, 'validation-error', `You entered "${value}". Email addresses need a domain like .com or .sg after the @.`);
+    input.classList.add('error');
+  } else if (value.indexOf('@') === 0) {
+    showPrompt(prompt, 'validation-error', 'Email address needs your name before the @ symbol.');
+    input.classList.add('error');
+  } else if (value.indexOf('@') === value.length - 1 || value.endsWith('@.')) {
+    showPrompt(prompt, 'validation-error', 'Email address needs a domain after the @ symbol (e.g. gmail.com).');
     input.classList.add('error');
   } else {
     hidePrompt(prompt);
