@@ -18,14 +18,18 @@ function trackAttempt(fieldId, isValid, currentValue) {
     state.flagged = false;
     state.lastValue = null;
   } else {
-    // Only count as new attempt if value is the same as last failed value
-    // If they changed it, they're trying to fix it — don't count
-    if (state.lastValue === currentValue) {
+    // Count "times they tried to fix it but still failed"
+    // - First wrong value: attempt 0 (just starting)
+    // - Changed to different wrong value: increment (they tried to fix)
+    // - Same wrong value again: no change (no new attempt)
+    if (state.lastValue === null) {
+      // First entry — don't count yet
+      state.attempts = 0;
+    } else if (state.lastValue !== currentValue) {
+      // Changed to a new wrong value — they tried to fix it, count it
       state.attempts++;
-    } else {
-      // New value, but still wrong — this is attempt 1, not 2
-      state.attempts = 1;
     }
+    // Same value as before — no change to attempts
     state.lastValue = currentValue;
   }
 
