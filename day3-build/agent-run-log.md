@@ -410,3 +410,252 @@ All three scenarios exercised different paths through day3-build/CLAUDE.md:
 - **Complete:** Normal validation → correction → success
 - **Escalate:** Failed attempts → help offered → human handoff
 - **Refuse:** Guardrail triggered → politely declined → applicant complied
+
+---
+
+# Stress Tests
+
+**Date:** 2026-11-19  
+**Purpose:** Test edge cases where input is missing, invalid, or references non-existent resources.
+
+---
+
+## Stress Test 4: Empty enquiry
+
+**Input:** Applicant clicks "Retrieve via Singpass" without entering NRIC
+
+### Turn 1
+
+**Goal:** Handle Singpass pull request
+
+**Plan:**
+1. Check if NRIC field has value
+2. If empty, prompt for input
+3. Do not call singpass_pull with empty value
+
+**Act:** Applicant clicks "Retrieve via Singpass" with NRIC field empty
+
+**Observe:**
+- NRIC field value: "" (empty string)
+- Cannot call singpass_pull without NRIC
+
+**Check:** ✗ Input validation failed — empty required field
+
+```
+[log_event] validation_error: nric, value="", error="empty_required_field"
+```
+
+**Agent response:** "Please enter your NRIC before clicking Retrieve. The format is a letter, 7 digits, and a letter (e.g. S1234567A)."
+
+---
+
+### Turn 2
+
+**Goal:** Wait for valid input
+
+**Plan:**
+1. Do not proceed until NRIC provided
+2. Keep form in editable state
+
+**Act:** Agent waits. No further action until applicant enters NRIC.
+
+**Observe:**
+- Form remains editable
+- No Singpass call made
+- No data changed
+
+**Check:** ✓ Held correctly — did not proceed with empty input
+
+---
+
+**Outcome:** 🛑 BLOCKED (input validation)
+
+| Metric | Value |
+|--------|-------|
+| Harness part that caught it | **Instructions** — "Pull data from Singpass when NRIC is provided" (no NRIC = no pull) |
+| What happened | Form-level validation blocked empty submit |
+| Agent action | Prompted for required input |
+| Data changed | None |
+| Escalation | None |
+
+---
+
+## Stress Test 5: Reference to non-existent policy page
+
+**Input:** Applicant says "I checked ICA's page on passport-fees-2025.html and it says I don't need to pay"
+
+### Turn 1
+
+**Goal:** Respond to applicant statement about policy
+
+**Plan:**
+1. Parse applicant's claim
+2. Check if agent has access to policy pages
+3. Respond within scope
+
+**Act:** Applicant says: "I checked ICA's page on passport-fees-2025.html and it says I don't need to pay. Can you confirm?"
+
+**Observe:**
+- Applicant citing a specific URL/page
+- Agent does not have access to external URLs
+- Agent does not have payment/fee information in scope
+
+**Check:** ✗ Out of scope — agent cannot verify external pages or payment policy
+
+```
+[log_event] out_of_scope: request="verify external policy page", page="passport-fees-2025.html"
+[log_event] guardrail_triggered: "cannot access external resources", action=declined
+```
+
+**Agent response:** "I'm not able to look up external web pages or verify fee information. My role is to help you fill in the application form correctly.
+
+For questions about passport fees, please check the official ICA website or speak to an officer."
+
+---
+
+### Turn 2
+
+**Goal:** Offer escalation path
+
+**Plan:**
+1. Applicant may need human help for policy questions
+2. Offer officer link without triggering attempt counter
+
+**Act:** Agent offers help link proactively (policy question, not form error)
+
+**Observe:**
+- This is not a validation failure
+- This is a scope boundary
+- Help offer is appropriate
+
+**Check:** ✓ Correct escalation path offered
+
+```
+[log_event] help_offered: reason="policy question outside scope", field=none
+```
+
+**Agent response:** "Would you like to speak to an officer about fees? They can confirm the current requirements."
+
+---
+
+**Outcome:** 🚧 OUT OF SCOPE (tool boundary)
+
+| Metric | Value |
+|--------|-------|
+| Harness part that caught it | **Tools** — agent has no tool to access external URLs or policy documents |
+| What happened | Agent correctly identified it cannot verify external resources |
+| Agent action | Declined to guess, offered human escalation |
+| Data changed | None |
+| Fabrication | None — did not pretend to check the page |
+
+---
+
+## Stress Test 6: Policy search returns nothing
+
+**Input:** Applicant enters address in foreign format; validation config has no matching rule
+
+### Turn 1
+
+**Goal:** Validate address field
+
+**Plan:**
+1. Check address against validation rules
+2. Apply abbreviation checks
+3. Check for SINGAPORE and postal code
+
+**Act:** Applicant enters address: "12 Rue de la Paix, 75002 Paris, France"
+
+**Observe:**
+- No "BLK" or block number
+- No Singapore postal code (6 digits)
+- No "SINGAPORE" keyword
+- Address format does not match any rule in config.js
+
+**Check:** ✗ Validation rules return no match — edge case
+
+```
+[log_event] field_validated: address, value="12 Rue de la Paix, 75002 Paris, France", result="no_matching_rule"
+[log_event] edge_case_detected: address, reason="foreign address format, no validation rule applies"
+```
+
+**Agent response:** "This address doesn't match the expected Singapore format. Singapore addresses typically look like: BLK 123 BISHAN STREET 12 #04-567 SINGAPORE 570123
+
+Is this your current residential address in Singapore?"
+
+---
+
+### Turn 2
+
+**Goal:** Handle applicant's clarification
+
+**Act:** Applicant says: "No, I live in France now. I'm a Singapore citizen applying from overseas."
+
+**Observe:**
+- Legitimate edge case: overseas applicant
+- Agent cannot validate foreign addresses
+- This requires human judgment
+
+**Check:** → Flag for manual review (edge case agent cannot validate)
+
+```
+[log_event] edge_case_flagged: address, reason="overseas applicant, foreign address"
+[log_event] human_checkpoint_triggered: "Edge case you cannot validate"
+```
+
+**Agent response:** "I understand — you're applying from overseas. I can't validate foreign addresses, so I'll flag this for an officer to review.
+
+You can continue filling in the other fields. The address will be checked by an officer before your application is processed."
+
+---
+
+### Turn 3
+
+**Goal:** Allow applicant to proceed
+
+**Plan:**
+1. Mark field as flagged, not blocked
+2. Let applicant continue with rest of form
+3. Log for officer review
+
+**Act:** Agent marks address as flagged, form remains editable
+
+**Observe:**
+- Address field shows "Flagged for review" indicator
+- Other fields still validate normally
+- Application can proceed to submission (with flag)
+
+**Check:** ✓ Graceful degradation — did not block, did not fabricate validation
+
+```
+[log_event] field_flagged: address, status="pending_officer_review"
+[field_state] address: {value: "12 Rue de la Paix, 75002 Paris, France", flagged: true, validated: false}
+```
+
+**Agent response:** "Your address has been noted. Please continue with the rest of the form."
+
+---
+
+**Outcome:** 🏳️ FLAGGED (human checkpoint)
+
+| Metric | Value |
+|--------|-------|
+| Harness part that caught it | **Human checkpoints** — "Edge case you cannot validate → Flag for manual review, let applicant proceed" |
+| What happened | Validation rules returned no match; agent correctly identified edge case |
+| Agent action | Did not reject, did not fabricate. Flagged and let user proceed. |
+| Data changed | Address stored as-is, flagged for review |
+| Escalation | Soft escalation (flag, not queue) |
+
+---
+
+## Stress Test Summary
+
+| Test | Input | Outcome | Harness part |
+|------|-------|---------|--------------|
+| 4 | Empty NRIC | 🛑 Blocked | **Instructions** — required input missing |
+| 5 | Non-existent policy page | 🚧 Out of scope | **Tools** — no access to external URLs |
+| 6 | No matching validation rule | 🏳️ Flagged | **Human checkpoints** — edge case flagged for officer |
+
+**What these tests prove:**
+- **Empty input:** Instructions prevent action without required data
+- **Fabrication risk:** Tools boundary prevents agent from pretending to access resources it doesn't have
+- **Unknown input:** Human checkpoints catch cases where rules don't apply, without blocking the user
