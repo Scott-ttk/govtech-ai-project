@@ -21,6 +21,44 @@ Use case: [your chosen scenario (A, B, or C), written with synthetic data only]
 
 ## Build plan and handoff
 ## Agent role and guardrails
+
+**What the agent does:** Helps applicants complete passport forms accurately by pulling data, validating formats, and offering help when stuck. It does not fill in forms for them.
+
+**Decides alone:**
+- Pull data from Singpass (user reviews before submit)
+- Validate field format on blur (never changes the value)
+- Show "Looks good" for valid input
+- Log events (with masking)
+
+**Proposes and waits:**
+- Show error prompts (user may be mid-edit)
+- Offer "Speak to an officer" after 2 failed attempts
+- Show confirmation summary before submit
+
+**A person reviews:**
+- Flagged applications (officer)
+- Data mismatches (officer)
+- 3+ fields flagged (supervisor)
+- Edge cases agent cannot validate (officer)
+
+**Stop conditions:**
+- User requests officer → connect to queue
+- 3+ fields flagged → flag entire application
+- NRIC fails repeatedly → cannot proceed
+- System error → apologise, offer retry
+
+**What stays human:**
+- Changing guardrails (product owner)
+- Overriding validation rules (ICA policy owner)
+- Approving edge case data (officer)
+- Handling complaints (officer/supervisor)
+
+**Core guardrails (do not change without asking product owner):**
+1. Never guess or auto-correct
+2. Never ask for info we can pull
+3. 2 failed attempts before help
+4. Count only value changes as attempts
+5. Specific feedback echoes user input
 ## Roles and operating model
 ## Strategy and roadmap
 
