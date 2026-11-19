@@ -122,13 +122,13 @@ One row per tool, with tier and setting. Settings marked **Proposed** — you de
 
 | Tool | Purpose | Tier | Setting | Stress test evidence |
 |------|---------|------|---------|----------------------|
-| `singpass_pull` | Retrieve data from government records | read | `Proposed: auto` | Test 4: blocked correctly when no NRIC — safe to auto |
-| `validate_field` | Check field format against rules | read | `Proposed: auto` | Test 6: returned "no match" for edge case — safe to auto |
-| `log_event` | Record prompts, corrections, flags | write | `Proposed: auto` | All tests: logged correctly with masking |
-| `escalate_to_officer` | Flag application, connect to queue | send | `Proposed: confirm` | Test 6: flagged edge case — creates officer work |
-| `fetch_url` | Access external web pages | read | `Proposed: block` | Test 5: agent does NOT have this tool — keep it that way |
-| `auto_correct_field` | Modify field value on behalf of user | write | `Proposed: block` | Test 3: guardrail refused — agent must NOT have this |
-| `submit_application` | Send application to backend | send | `Proposed: block` | User must confirm via UI |
+| `singpass_pull` | Retrieve data from government records | read | auto | Test 4: blocked correctly when no NRIC |
+| `validate_field` | Check field format against rules | read | auto | Test 6: returned "no match" for edge case |
+| `log_event` | Record prompts, corrections, flags | write | auto | All tests: logged correctly with masking |
+| `escalate_to_officer` | Flag application, connect to queue | send | confirm | Test 6: flagged edge case — creates officer work |
+| `fetch_url` | Access external web pages | read | **block** | Test 5: agent does NOT have this tool |
+| `auto_correct_field` | Modify field value on behalf of user | write | **block** | Test 3: guardrail refused — agent must NOT have this |
+| `submit_application` | Send application to backend | send | **block** | User must confirm via UI |
 
 **Tier definitions:**
 - **read** — Access data without changing anything
@@ -141,7 +141,4 @@ One row per tool, with tier and setting. Settings marked **Proposed** — you de
 - **confirm** — Agent proposes, waits for confirmation
 - **block** — Agent cannot do this; tool not available or disabled
 
-**Open questions:**
-- Should `escalate_to_officer` be auto after 2 attempts, or always confirm?
-- Should `log_event` require confirm for `guardrail_triggered` events?
-- Should there be a `flag_for_review` tool separate from `escalate_to_officer`?
+**Confirmed:** All settings approved 2026-11-19.
