@@ -60,6 +60,41 @@ Use case: [your chosen scenario (A, B, or C), written with synthetic data only]
 4. Count only value changes as attempts
 5. Specific feedback echoes user input
 ## Roles and operating model
+
+**Key roles:**
+
+| Role | Responsibility |
+|------|----------------|
+| Product owner | Owns scope, guardrails, outcomes. Accountable for agent behaviour. |
+| Engineering lead | Owns implementation and deployment. Holds the kill switch. |
+| Operations lead | Owns officer workflows and escalation queues. |
+| Security lead | Owns incident response. Decides how to respond to harm. |
+| Officer | Front-line human checkpoint. First to see wrong answers. |
+| Supervisor | Handles systemic issues (3+ flags) and complaints. |
+
+**Decision rights:**
+
+| Decision | Who decides | Who is told |
+|----------|-------------|-------------|
+| Scope (what agent does) | Product owner | Officer, Security lead |
+| Permissions (auto/confirm/block) | Product owner | Officer, Legal |
+| Go-live | Product owner | Officer, Supervisor |
+| Incident response | Security lead | Product owner, Officer, Legal |
+| Kill switch | Engineering lead | Product owner, Security lead |
+
+**Incident response (what was missing):**
+
+| Item | Answer |
+|------|--------|
+| **Kill switch owner** | Engineering lead (or on-call engineer outside hours) |
+| **On-call rota** | Engineering: 24/7. Product owner: business hours. Officer: shift hours. |
+| **Severity levels** | S1: wrong data submitted (stop agent). S2: wrong prompt shown (investigate). S3: edge case flagged (log and review). |
+| **Response time** | S1: 15 min to acknowledge, 1 hour to resolve or escalate. S2: 4 hours. S3: next business day. |
+| **Who tells applicant** | Officer (with script from Product owner) |
+| **Product owner notification** | Told immediately for S1, within 4 hours for S2 |
+| **Rollback criteria** | Any S1 incident, or 3+ S2 incidents in 24 hours |
+| **Post-incident review** | Security lead runs it within 48 hours. Product owner, Engineering lead, Officer attend. |
+
 ## Strategy and roadmap
 
 ### Strategy kernel
