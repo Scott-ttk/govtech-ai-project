@@ -97,24 +97,24 @@ Every action the agent takes, with tier and proposed setting:
 
 | Action | Tier | Setting | Notes |
 |--------|------|---------|-------|
-| **Read NRIC from input** | read | `Proposed: auto` | Needed to call Singpass |
-| **Call singpass_pull** | read | `Proposed: auto` | Standard retrieval, user reviews result |
-| **Read field value on blur** | read | `Proposed: auto` | Needed to validate |
-| **Check value against validation rules** | read | `Proposed: auto` | Internal logic |
-| **Draft error prompt message** | draft | `Proposed: auto` | Echoes user input, follows template |
-| **Draft success message ("Looks good")** | draft | `Proposed: auto` | Soft confirmation |
-| **Write prompt to UI** | write | `Proposed: auto` | User sees immediately |
-| **Write auto-filled data to form fields** | write | `Proposed: auto` | After Singpass pull, user can edit |
-| **Draft help offer message** | draft | `Proposed: confirm` | After 2 attempts, significant moment |
-| **Write help link to UI** | write | `Proposed: confirm` | Visible escalation path |
-| **Log session_start event** | write | `Proposed: auto` | Internal telemetry |
-| **Log field_validated event** | write | `Proposed: auto` | Internal telemetry |
-| **Log attempt_counted event** | write | `Proposed: auto` | Internal telemetry |
-| **Log help_offered event** | write | `Proposed: auto` | Internal telemetry |
-| **Log help_accepted event** | write | `Proposed: auto` | Internal telemetry |
-| **Log session_end event** | write | `Proposed: auto` | Internal telemetry |
-| **Send escalation to officer queue** | send | `Proposed: confirm` | Creates work for officer |
-| **Send application to backend** | send | `Proposed: block` | User must confirm via UI, not agent |
+| **Read NRIC from input** | read | auto | Needed to call Singpass |
+| **Call singpass_pull** | read | auto | Standard retrieval, user reviews result |
+| **Read field value on blur** | read | auto | Needed to validate |
+| **Check value against validation rules** | read | auto | Internal logic |
+| **Draft error prompt message** | draft | auto | Echoes user input, follows template |
+| **Draft success message ("Looks good")** | draft | auto | Soft confirmation |
+| **Write prompt to UI** | write | auto | User sees immediately |
+| **Write auto-filled data to form fields** | write | auto | After Singpass pull, user can edit |
+| **Draft help offer message** | draft | confirm | After 2 attempts, significant moment |
+| **Write help link to UI** | write | confirm | Visible escalation path |
+| **Log session_start event** | write | auto | Internal telemetry |
+| **Log field_validated event** | write | auto | Internal telemetry |
+| **Log attempt_counted event** | write | auto | Internal telemetry |
+| **Log help_offered event** | write | auto | Internal telemetry |
+| **Log help_accepted event** | write | auto | Internal telemetry |
+| **Log session_end event** | write | auto | Internal telemetry |
+| **Send escalation to officer queue** | send | confirm | Creates work for officer |
+| **Send application to backend** | send | block | User must confirm via UI, not agent |
 
 **Tier definitions:**
 - **read** — Access data without changing anything
